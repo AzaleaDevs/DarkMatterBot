@@ -29,8 +29,19 @@ class Meme(commands.Cog):
                 # Font setup
                 font_size = 60
                 try:
-                    font = ImageFont.truetype("arial.ttf", font_size)
-                except IOError:
+                    # Try local font first (Windows/Dev)
+                    if os.path.exists("arial.ttf"):
+                        font = ImageFont.truetype("arial.ttf", font_size)
+                    # Try Docker font (Linux)
+                    elif os.path.exists("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"):
+                        font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", font_size)
+                    else:
+                        # Fallback
+                        print("Warning: Using default font")
+                        font = ImageFont.load_default()
+                        font_size = 20
+                except Exception as e:
+                    print(f"Font loading error: {e}")
                     font = ImageFont.load_default()
                     font_size = 20
                 
@@ -110,7 +121,8 @@ class Meme(commands.Cog):
                     text_x = (width - text_w) / 2
                     
                     # Draw stroke
-                    draw.text((text_x, current_y), line, font=font, fill="black", stroke_width=4, stroke_fill="black")
+                    # Draw text (No stroke)
+                    draw.text((text_x, current_y), line, font=font, fill="black")
                     
                     current_y += line_heights[i] + 10
 
