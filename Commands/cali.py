@@ -10,6 +10,7 @@ import random
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from hola_db import get_random_porro
+from db_utils import add_user_porro
 
 class OpenButton(Button):
     def __init__(self):
@@ -29,6 +30,9 @@ class OpenButton(Button):
         p_nombre = porro['nombre']
         p_descripcion = porro['descripcion']
         p_edicion = porro['edicion']
+
+        # Save to DB
+        await add_user_porro(interaction.user.id, p_id)
 
         # Create new embed
         embed = discord.Embed(title="Cali Pack Opened!", color=discord.Color.gold())
