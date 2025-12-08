@@ -43,22 +43,28 @@ class InventoryView(View):
             embed.set_thumbnail(url=self.avatar_url)
             
             # Currency section
+            euro_emote = "<:euro:1447681410591625391>"
+            kogo_emote = "<:kogo:1442289064794656808>"
+            
             embed.add_field(
                 name="💵 Monedas",
                 value=(
-                    f"**Euros:** {inventory['euros']}\n"
-                    f"**Kogos:** {inventory['kogos']}"
+                    f"{euro_emote} **Euros:** {inventory['euros']}\n"
+                    f"{kogo_emote} **Kogos:** {inventory['kogos']}"
                 ),
                 inline=False
             )
             
             # Cali Packs section
+            park_emote = "<:loot_parkbangers:1442289067159982081>"
+            semsem_emote = "<:loot_sweetsemsem:1447681348402810950>"
+            
             embed.add_field(
                 name="🎁 Cali Packs",
                 value=(
-                    f"**Cali - The Park Bangers:** {inventory['cali_park']}\n"
-                    f"**Cali - Deluxe:** {inventory['cali_dx']}\n"
-                    f"**Cali - Sweet Semsem:** {inventory['cali_semsem']}"
+                    f"{park_emote} **Cali - The Park Bangers:** {inventory['cali_park']}\n"
+                    f"🎁 **Cali - Deluxe:** {inventory['cali_dx']}\n"
+                    f"{semsem_emote} **Cali - Sweet Semsem:** {inventory['cali_semsem']}"
                 ),
                 inline=False
             )
