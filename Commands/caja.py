@@ -10,6 +10,7 @@ import io
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from db_utils import get_porros_by_edition, get_user_porros
+from hola_db import is_user_registered
 
 class Caja(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -18,6 +19,14 @@ class Caja(commands.Cog):
     @app_commands.command(name="caja", description="Muestra tu colección de porros de una edición.")
     @app_commands.describe(edicion="La edición de la colección (ej. PAR)")
     async def caja(self, interaction: discord.Interaction, edicion: str):
+        # Check if user is registered
+        if not await is_user_registered(interaction.user.id):
+            await interaction.response.send_message(
+                "Aún no estás registrado en el barrio para poder usar estos comandos. Prueba a hacer /start",
+                ephemeral=True
+            )
+            return
+        
         await interaction.response.defer()
 
         # Fetch all joints for the edition
