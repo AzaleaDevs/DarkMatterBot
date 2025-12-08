@@ -4,6 +4,12 @@ from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import io
 import os
+import sys
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from hola_db import is_user_registered
 
 class Meme(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -12,6 +18,14 @@ class Meme(commands.Cog):
     @app_commands.command(name="meme", description="Crea un meme con texto degradado.")
     @app_commands.describe(text="Texto para el meme")
     async def meme(self, interaction: discord.Interaction, text: str):
+        # Check if user is registered
+        if not await is_user_registered(interaction.user.id):
+            await interaction.response.send_message(
+                "Aún no estás registrado en el barrio para poder usar estos comandos. Prueba a hacer /start",
+                ephemeral=True
+            )
+            return
+        
         await interaction.response.defer()
         
         try:

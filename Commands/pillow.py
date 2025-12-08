@@ -3,6 +3,13 @@ from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import io
+import sys
+import os
+
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from hola_db import is_user_registered
 
 class Pillow(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -11,6 +18,14 @@ class Pillow(commands.Cog):
     @app_commands.command(name="pillow", description="Genera una imagen con texto.")
     @app_commands.describe(text="Texto para la imagen (máx 20 letras, una sola palabra)")
     async def pillow(self, interaction: discord.Interaction, text: str):
+        # Check if user is registered
+        if not await is_user_registered(interaction.user.id):
+            await interaction.response.send_message(
+                "Aún no estás registrado en el barrio para poder usar estos comandos. Prueba a hacer /start",
+                ephemeral=True
+            )
+            return
+        
         # Validation
         if len(text) > 20:
             await interaction.response.send_message("❌ El texto no puede tener más de 20 letras.", ephemeral=True)

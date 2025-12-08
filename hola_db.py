@@ -3,9 +3,19 @@ import os
 
 DB_PATH = os.path.join("Databases", "darkmatter_pro.db")
 
-async def check_user(user_id: int):
+async def is_user_registered(user_id: int):
     """
     Checks if a user exists in the USUARIOS table.
+    Returns True if user exists, False otherwise.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT id FROM USUARIOS WHERE id = ?", (user_id,)) as cursor:
+            row = await cursor.fetchone()
+            return row is not None
+
+async def get_user_data(user_id: int):
+    """
+    Fetches complete user data from USUARIOS table.
     Returns the user row if found, else None.
     """
     async with aiosqlite.connect(DB_PATH) as db:
