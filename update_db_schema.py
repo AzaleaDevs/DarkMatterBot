@@ -3,29 +3,20 @@ import os
 
 db_path = r"Databases/darkmatter_pro.db"
 
-def recreate_table():
+def update_schema():
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Drop existing table
-        cursor.execute("DROP TABLE IF EXISTS RELACION_USUARIOS_PORROS")
-        print("Dropped table RELACION_USUARIOS_PORROS")
-        
-        # Create new table
-        # id_user: Discord User ID (as requested)
-        # id_porro: ID of the joint from PORROS table
-        # cantidad: Quantity owned
-        create_query = """
-        CREATE TABLE RELACION_USUARIOS_PORROS (
-            id_user INTEGER,
-            id_porro INTEGER,
-            cantidad INTEGER DEFAULT 1,
-            PRIMARY KEY (id_user, id_porro)
-        )
-        """
-        cursor.execute(create_query)
-        print("Created table RELACION_USUARIOS_PORROS")
+        # Add last_paga column to USUARIOS table if it doesn't exist
+        try:
+            cursor.execute("ALTER TABLE USUARIOS ADD COLUMN last_paga TEXT DEFAULT NULL")
+            print("Added column last_paga to USUARIOS")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name" in str(e):
+                print("Column last_paga already exists in USUARIOS")
+            else:
+                raise e
         
         conn.commit()
         conn.close()
@@ -34,4 +25,4 @@ def recreate_table():
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    recreate_table()
+    update_schema()
