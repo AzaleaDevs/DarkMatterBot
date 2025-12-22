@@ -127,6 +127,10 @@ class PackSelectionView(View):
     
     @discord.ui.button(label="◀️", style=discord.ButtonStyle.primary)
     async def previous_pack(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("Este no es tu inventario.", ephemeral=True)
+            return
+        
         if len(self.available_packs) > 1:
             self.current_index = (self.current_index - 1) % len(self.available_packs)
             embed, config = self.get_pack_embed()
@@ -144,6 +148,10 @@ class PackSelectionView(View):
     
     @discord.ui.button(label="🎁 Open", style=discord.ButtonStyle.success)
     async def open_pack(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("No molestes, este pack no es tuyo.", ephemeral=True)
+            return
+
         pack_type = self.get_current_pack_type()
         if not pack_type:
             await interaction.response.send_message("Error: No pack selected", ephemeral=True)
@@ -250,6 +258,10 @@ class PackSelectionView(View):
     
     @discord.ui.button(label="▶️", style=discord.ButtonStyle.primary)
     async def next_pack(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("Este no es tu inventario.", ephemeral=True)
+            return
+
         if len(self.available_packs) > 1:
             self.current_index = (self.current_index + 1) % len(self.available_packs)
             embed, config = self.get_pack_embed()

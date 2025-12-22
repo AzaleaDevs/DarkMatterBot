@@ -159,3 +159,41 @@ async def get_user_cali_packs(discord_id: int):
                     'cali_semsem': row['cali_semsem']
                 }
             return None
+
+async def update_user_cali_pack(discord_id: int, pack_type: str, amount: int):
+    """
+    Updates user's cali pack count by adding the specified amount.
+    pack_type: 'cali_park', 'cali_dx', 'cali_semsem'
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            f"UPDATE USUARIOS SET {pack_type} = {pack_type} + ? WHERE id = ?",
+            (amount, discord_id)
+        )
+        await db.commit()
+
+async def get_last_paga(discord_id: int):
+    """
+    Returns the last paga timestamp for a user.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT last_paga FROM USUARIOS WHERE id = ?", (discord_id,)) as cursor:
+            row = await cursor.fetchone()
+            return row[0] if row else None
+
+async def update_last_paga(discord_id: int, timestamp: str):
+    """
+    Updates the last paga timestamp for a user.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("UPDATE USUARIOS SET last_paga = ? WHERE id = ?", (timestamp, discord_id))
+        await db.commit()
+
+async def get_user_balance(discord_id: int):
+    """
+    Returns the user's euro balance.
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT euros FROM USUARIOS WHERE id = ?", (discord_id,)) as cursor:
+            row = await cursor.fetchone()
+            return row[0] if row else 0
