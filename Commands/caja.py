@@ -69,8 +69,16 @@ class Caja(commands.Cog):
             x = grid_offset_x + col * cell_size + offset
             y = grid_offset_y + row * cell_size + offset
 
+            # Determine folder based on edition
+            edition_folders = {
+                'PAR': 'The Park Bangers',
+                'SEM': 'Sweet Semsem',
+                'DLX': 'Deluxe' # Future proofing
+            }
+            folder_name = edition_folders.get(edicion, 'The Park Bangers') # Default to PAR
+
             # Load image
-            image_path = os.path.join("Images", "The Park Bangers", f"{joint_id}.png")
+            image_path = os.path.join("Images", folder_name, f"{joint_id}.png")
             
             if os.path.exists(image_path):
                 try:

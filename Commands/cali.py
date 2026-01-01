@@ -31,7 +31,7 @@ PACK_CONFIGS = {
         'name': 'Cali - Sweet Semsem',
         'edition': 'SEM',
         'image_folder': 'Sweet Semsem',
-        'loot_image': 'loot_semsem.png',
+        'loot_image': 'loot_sweetsemsem.png',
         'guaranteed_joint': False
     },
     'cali_dx': {

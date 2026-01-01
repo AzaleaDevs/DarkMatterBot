@@ -26,11 +26,11 @@ class TiendaView(View):
         self.add_item(self.park_button)
         
         self.semsem_button = Button(
-            label="Sweet Semsem (???€)", 
-            style=discord.ButtonStyle.secondary,
-            custom_id="buy_semsem",
-            disabled=True
+            label="Sweet Semsem (15€)", 
+            style=discord.ButtonStyle.primary,
+            custom_id="buy_semsem"
         )
+        self.semsem_button.callback = self.buy_semsem_callback
         self.add_item(self.semsem_button)
 
     async def buy_park_callback(self, interaction: discord.Interaction):
@@ -38,16 +38,58 @@ class TiendaView(View):
             await interaction.response.send_message("Esta no es tu tienda.", ephemeral=True)
             return
 
-        # Show confirmation
-        view = ConfirmView(self.user_id, "Park Bangers", 15)
-        await interaction.response.edit_message(view=view)
+        # Show confirmation with image
+        view = ConfirmView(self.user_id, "Park Bangers", 15, "cali_park")
+        
+        embed = discord.Embed(
+            title="Confirmar Compra",
+            description="¿Quieres comprar un **Cali Pack - Park Bangers** por **15€**?",
+            color=discord.Color.gold()
+        )
+        
+        # Load image
+        file = None
+        if os.path.exists("Images/The Park Bangers/loot_parkbangers.png"):
+            file = discord.File("Images/The Park Bangers/loot_parkbangers.png", filename="loot.png")
+            embed.set_image(url="attachment://loot.png")
+            
+        if file:
+            await interaction.response.edit_message(embed=embed, view=view, attachments=[file])
+        else:
+            await interaction.response.edit_message(embed=embed, view=view, attachments=[])
+
+    async def buy_semsem_callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("Esta no es tu tienda.", ephemeral=True)
+            return
+
+        # Show confirmation with image
+        view = ConfirmView(self.user_id, "Sweet Semsem", 15, "cali_semsem")
+        
+        embed = discord.Embed(
+            title="Confirmar Compra",
+            description="¿Quieres comprar un **Cali Pack - Sweet Semsem** por **15€**?",
+            color=discord.Color.gold()
+        )
+        
+        # Load image
+        file = None
+        if os.path.exists("Images/Sweet Semsem/loot_sweetsemsem.png"):
+            file = discord.File("Images/Sweet Semsem/loot_sweetsemsem.png", filename="loot.png")
+            embed.set_image(url="attachment://loot.png")
+            
+        if file:
+            await interaction.response.edit_message(embed=embed, view=view, attachments=[file])
+        else:
+            await interaction.response.edit_message(embed=embed, view=view, attachments=[])
 
 class ConfirmView(View):
-    def __init__(self, user_id: int, item_name: str, price: int):
+    def __init__(self, user_id: int, item_name: str, price: int, pack_type: str):
         super().__init__(timeout=60)
         self.user_id = user_id
         self.item_name = item_name
         self.price = price
+        self.pack_type = pack_type
         
         yes_btn = Button(label="YES", style=discord.ButtonStyle.success)
         yes_btn.callback = self.yes_callback
@@ -66,18 +108,20 @@ class ConfirmView(View):
             await interaction.response.send_message("No tienes suficiente dinero.", ephemeral=True)
             # Return to shop
             embed = await self.get_shop_embed(interaction.user)
-            await interaction.response.edit_message(embed=embed, view=TiendaView(self.user_id))
+            await interaction.followup.edit_message(message_id=interaction.message.id, embed=embed, view=TiendaView(self.user_id), attachments=[])
             return
 
         # Process transaction
         await update_user_currency(self.user_id, euros=-self.price)
-        await update_user_cali_pack(self.user_id, "cali_park", 1)  # Assuming Park Bangers maps to cali_park
+        await update_user_cali_pack(self.user_id, self.pack_type, 1)
         
-        await interaction.response.send_message(f"Has comprado **{self.item_name}**!", ephemeral=True)
-        
-        # Return to main shop view
+        # Return to main shop view FIRST (to remove buttons)
         embed = await self.get_shop_embed(interaction.user)
-        await interaction.response.edit_message(embed=embed, view=TiendaView(self.user_id))
+        # Remove attachments (previous image)
+        await interaction.response.edit_message(embed=embed, view=TiendaView(self.user_id), attachments=[])
+        
+        # Then send ephemeral success message
+        await interaction.followup.send(f"Has comprado **{self.item_name}**!", ephemeral=True)
 
     async def no_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user_id:
@@ -85,7 +129,7 @@ class ConfirmView(View):
             
         # Cancel and return to shop
         embed = await self.get_shop_embed(interaction.user)
-        await interaction.response.edit_message(embed=embed, view=TiendaView(self.user_id))
+        await interaction.response.edit_message(embed=embed, view=TiendaView(self.user_id), attachments=[])
 
     async def get_shop_embed(self, user):
         balance = await get_user_balance(user.id)
@@ -95,7 +139,7 @@ class ConfirmView(View):
             color=discord.Color.green()
         )
         embed.set_thumbnail(url=user.display_avatar.url)
-        embed.add_field(name="Items Disponibles", value="• Cali pack The Park Bangers - 15€\n• Cali pack Sweet Semsem - ???€", inline=False)
+        embed.add_field(name="Items Disponibles", value="• Cali pack The Park Bangers - 15€\n• Cali pack Sweet Semsem - 15€", inline=False)
         return embed
 
 class Tienda(commands.Cog):
@@ -116,7 +160,7 @@ class Tienda(commands.Cog):
             color=discord.Color.green()
         )
         embed.set_thumbnail(url=interaction.user.display_avatar.url)
-        embed.add_field(name="Items Disponibles", value="• Cali pack The Park Bangers - 15€\n• Cali pack Sweet Semsem - ???€", inline=False)
+        embed.add_field(name="Items Disponibles", value="• Cali pack The Park Bangers - 15€\n• Cali pack Sweet Semsem - 15€", inline=False)
         
         view = TiendaView(interaction.user.id)
         await interaction.response.send_message(embed=embed, view=view)

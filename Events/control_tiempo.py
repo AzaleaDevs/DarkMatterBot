@@ -21,18 +21,17 @@ class ControlTiempo(commands.Cog):
         # -----------------------------------------------------------
         if before.channel is None and after.channel is not None:
             # User joined a voice channel
-            # Only start timer if NOT in AFK channel
-            if after.channel.id != AFK_CHANNEL_ID:
+            if user_id not in self.voice_sessions:
                 self.voice_sessions[user_id] = datetime.utcnow()
                 print(f"[+] {member} joined voice channel {after.channel.name}. Timer started.")
             else:
-                print(f"[+] {member} joined AFK channel. No timer started.")
+                print(f"[+] {member} joined voice channel {after.channel.name}. Timer already running.")
 
         # -----------------------------------------------------------
         # LEAVING A VOICE CHANNEL
         # -----------------------------------------------------------
         elif before.channel is not None and after.channel is None:
-            # User left a voice channel
+            # User left a voice channel (disconnected completely)
             if user_id in self.voice_sessions:
                 # Calculate time spent
                 start_time = self.voice_sessions[user_id]
@@ -51,38 +50,19 @@ class ControlTiempo(commands.Cog):
                 # Remove from active sessions
                 del self.voice_sessions[user_id]
             else:
-                print(f"[-] {member} left voice (was in AFK or no timer).")
+                print(f"[-] {member} left voice (no active timer).")
 
         # -----------------------------------------------------------
         # SWITCHING VOICE CHANNELS
         # -----------------------------------------------------------
         elif before.channel != after.channel:
-            # User switched channels
-            
-            # If they had an active timer (not in AFK), calculate and award
-            if user_id in self.voice_sessions:
-                start_time = self.voice_sessions[user_id]
-                end_time = datetime.utcnow()
-                
-                total_seconds = int((end_time - start_time).total_seconds())
-                minutes_earned = total_seconds // 60  # Round down
-                
-                # Update database with euros earned
-                if minutes_earned > 0:
-                    await self.add_euros_to_user(user_id, minutes_earned)
-                    print(f"[~] {member} switched channels. Previous time: {total_seconds}s ({minutes_earned} euros earned).")
-                else:
-                    print(f"[~] {member} switched channels. Previous time: {total_seconds}s (no euros earned).")
-                
-                # Remove old timer
-                del self.voice_sessions[user_id]
-            
-            # Start new timer if new channel is NOT AFK
-            if after.channel.id != AFK_CHANNEL_ID:
+            # User switched channels - Keep timer running
+            if user_id not in self.voice_sessions:
+                # Should be running, but just in case
                 self.voice_sessions[user_id] = datetime.utcnow()
-                print(f"[~] {member} new timer started in {after.channel.name}.")
+                print(f"[~] {member} switched channels. Timer started (was missing).")
             else:
-                print(f"[~] {member} moved to AFK channel. No timer started.")
+                print(f"[~] {member} switched channels. Timer continues.")
 
     async def add_euros_to_user(self, user_id: int, euros: int):
         """
