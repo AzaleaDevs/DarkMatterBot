@@ -1,5 +1,12 @@
 {
     "DISCORD_TOKEN": "MTQ0MTkzOTc4NTcxMDA0NzI0Mg.Gw2RUC.Qoj7unG5_FUZothzaGPMZaQYgYKMdnnjUakmJw",
     "GUILD_ID": "1395474837102788749",
-    "STATE":"Probando la materia."
+    "STATE":"Probando la materia.",
+    "BOSS_KILL_API": {
+        "ENABLED": true,
+        "HOST": "0.0.0.0",
+        "PORT": 8088,
+        "TOKEN": "00013071993",
+        "CHANNEL_ID": "1395474837589463114"
+    }
 }
