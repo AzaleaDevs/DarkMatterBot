@@ -1,0 +1,36 @@
+WARNING:discord.client:PyNaCl is not installed, voice will NOT be supported
+[2026-06-03 23:10:20] [INFO    ] discord.client: logging in using static token
+INFO:discord.client:logging in using static token
+INFO:__main__:Setting up the bot...
+INFO:__main__:Loaded command extension: Commands.blackmarket
+INFO:__main__:Loaded command extension: Commands.caja
+INFO:__main__:Loaded command extension: Commands.cali
+INFO:__main__:Loaded command extension: Commands.emote
+INFO:__main__:Loaded command extension: Commands.inventario
+INFO:__main__:Loaded command extension: Commands.meme
+INFO:__main__:Loaded command extension: Commands.paga
+INFO:__main__:Loaded command extension: Commands.pillow
+INFO:__main__:Loaded command extension: Commands.pingy
+INFO:__main__:Loaded command extension: Commands.poke
+INFO:__main__:Loaded command extension: Commands.prueba
+INFO:__main__:Loaded command extension: Commands.random
+INFO:__main__:Loaded command extension: Commands.rasca
+INFO:__main__:Loaded command extension: Commands.soypoke
+INFO:__main__:Loaded command extension: Commands.start
+INFO:__main__:Loaded command extension: Commands.tienda
+INFO:__main__:Loaded event extension: Events.control_tiempo
+INFO:__main__:Commands synced
+INFO:__main__:Boss kill API listening on 0.0.0.0:8088
+INFO:__main__:BOT RUNNING
+[2026-06-03 23:10:21] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 00e4a59bab57d5fab1364a7f333f7c51).
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 00e4a59bab57d5fab1364a7f333f7c51).
+INFO:__main__:Logged in as Dark Matter BOT#1089 (ID: 1441939785710047242)
+INFO:__main__:------
+INFO:__main__:Boss kill notification sent: Prueba DarkMatter by Codex
+INFO:aiohttp.access:192.168.4.59 [03/Jun/2026:22:11:38 +0100] "POST /azerothcore/boss-kill HTTP/1.1" 200 191 "-" "-"
+INFO:__main__:Boss kill notification sent: Onyxia by Cacafuti
+INFO:aiohttp.access:192.168.4.59 [03/Jun/2026:22:22:19 +0100] "POST /azerothcore/boss-kill HTTP/1.1" 200 191 "-" "-"
+[2026-06-03 23:24:10] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 00e4a59bab57d5fab1364a7f333f7c51.
+INFO:discord.gateway:Shard ID None has successfully RESUMED session 00e4a59bab57d5fab1364a7f333f7c51.
+INFO:__main__:Boss kill notification sent: Witch Doctor Zum'rah by Cacafuti
+INFO:aiohttp.access:192.168.4.59 [03/Jun/2026:22:29:42 +0100] "POST /azerothcore/boss-kill HTTP/1.1" 200 191 "-" "-"
