@@ -1,0 +1,6 @@
+name: DarkmatterDiscordBridge
+version: 1.0.0
+main: dev.azalea.darkmatterdiscordbridge.DarkmatterDiscordBridgePlugin
+api-version: "1.20"
+author: AzaleaDevs
+description: Sends Minecraft join events to the Dark Matter Discord bot.
