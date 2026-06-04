@@ -1,7 +1,7 @@
 -- Envia boss kills de AzerothCore/Eluna al bot DarkMatter.
 -- Requiere curl disponible en el host/contenedor donde corre worldserver.
 
-local BOT_HOST = "192.168.4.71"
+local BOT_HOST = "192.168.4.59"
 local BOT_PORT = 8088
 local BOT_PATH = "/azerothcore/boss-kill"
 local BOT_TOKEN = "00013071993"
