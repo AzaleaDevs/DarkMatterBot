@@ -8,5 +8,14 @@
         "PORT": 8088,
         "TOKEN": "00013071993",
         "CHANNEL_ID": "1395474837589463114"
+    },
+    "MINECRAFT_API": {
+        "ENABLED": true,
+        "HOST": "0.0.0.0",
+        "PORT": 8088,
+        "TOKEN": "00013071993",
+        "CHANNEL_ID": "1395474837589463114",
+        "SERVER_NAME": "Minecraft",
+        "USE_SKIN_THUMBNAIL": true
     }
 }
