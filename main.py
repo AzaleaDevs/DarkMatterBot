@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import discord
 from discord.ext import commands, tasks
@@ -18,11 +18,14 @@ with open('config.json', encoding="utf8") as config_file:
 
 
 # Config values
-TOKEN = config["DISCORD_TOKEN"]
+TOKEN = os.getenv("DISCORD_TOKEN") or config.get("DISCORD_TOKEN")
 GUILD_ID = config["GUILD_ID"]
 PREFIX = "!"
 BOSS_KILL_API = config.get("BOSS_KILL_API", {})
 MINECRAFT_API = config.get("MINECRAFT_API", {})
+
+if not TOKEN or TOKEN.startswith("<"):
+    raise RuntimeError("Missing DISCORD_TOKEN. Set it in .env or as an environment variable.")
 
 class DarkMatterBot(commands.Bot):
     def __init__(self, intents: discord.Intents):
@@ -42,7 +45,7 @@ class DarkMatterBot(commands.Bot):
         await self.start_boss_kill_api()
         
         # -----------------------------
-        #   INITIALIZACIÓN DE BD 
+        #   INITIALIZACIÃ“N DE BD 
         #   (mantengo EXACTAMENTE lo tuyo)
         # -----------------------------
         # await self.connect_db()
@@ -201,7 +204,7 @@ class DarkMatterBot(commands.Bot):
         logger.info("Commands synced")
 
     # -----------------------------------------------------------
-    #   Inicialización de base de datos (MANTENIDO TAL CUAL)
+    #   InicializaciÃ³n de base de datos (MANTENIDO TAL CUAL)
     # -----------------------------------------------------------
     # async def connect_db(self):
     #     self.db = await aiosqlite.connect(r"Files/memeria.db")
@@ -221,3 +224,4 @@ async def on_ready():
     logger.info('------')
 
 bot.run(TOKEN)
+
