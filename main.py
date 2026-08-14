@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load config
-with open('config.json', encoding="utf8") as config_file:
+with open('config.json', encoding="utf-8-sig") as config_file:
     config = json.load(config_file)
 
 
@@ -224,4 +224,5 @@ async def on_ready():
     logger.info('------')
 
 bot.run(TOKEN)
+
 
