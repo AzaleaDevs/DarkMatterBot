@@ -1,6 +1,5 @@
 local MODULE = "DarkMatterBridge"
 local STATE_FILE = "DarkMatterBridge_state.json"
-local EVENTS_FILE = "DarkMatterBridge_events.jsonl"
 local WRITE_INTERVAL_MS = 30000
 local DEATH_DEDUPLICATION_MS = 10000
 
@@ -142,9 +141,8 @@ local function recordDeath(player, args, source)
         "}"
     })
 
-    if writeTextFile(EVENTS_FILE, event, true) then
-        print("[DarkMatterBridge] Recorded death for " .. username)
-    end
+    print("[DarkMatterBridgeEvent] " .. event)
+    print("[DarkMatterBridge] Recorded death for " .. username)
     writeState()
 end
 
@@ -199,7 +197,6 @@ end
 
 local function onServerStarted()
     print("[DarkMatterBridge] Started")
-    writeTextFile(EVENTS_FILE, "", false)
     writeState()
 end
 

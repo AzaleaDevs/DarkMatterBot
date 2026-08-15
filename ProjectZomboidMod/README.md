@@ -4,12 +4,12 @@ Integracion para servidores Project Zomboid Build 42 alojados en GTXGaming.
 
 ## Funcionamiento
 
-El mod genera dos archivos dentro de la carpeta Lua del servidor:
+El puente exporta el estado a un archivo y las muertes al log del servidor:
 
 - DarkMatterBridge_state.json: hora ingame y jugadores conectados.
-- DarkMatterBridge_events.jsonl: registro incremental de muertes.
+- World/server-console.txt: eventos de muerte identificados con [DarkMatterBridgeEvent].
 
-DarkMatter consulta esos archivos por SFTP cada 30 segundos. Las muertes se publican en el canal configurado y /time muestra la fecha y hora ingame.
+DarkMatter consulta el estado y el log por SFTP cada 30 segundos. Las muertes se publican en el canal configurado y /time muestra la fecha y hora ingame.
 
 ## Instalar el mod
 
@@ -30,9 +30,9 @@ Si el servidor usa un ClientCommandFilter restrictivo, permite:
 Reinicia el servidor. Al arrancar, busca estos archivos desde el File Manager o SFTP para obtener sus rutas absolutas:
 
     DarkMatterBridge_state.json
-    DarkMatterBridge_events.jsonl
+    server-console.txt
 
-En este servidor GTXGaming se crean bajo /188.165.119.37_17200/World/Lua/.
+En este servidor GTXGaming, el estado esta en /188.165.119.37_17200/World/Lua/ y el log en /188.165.119.37_17200/World/.
 
 ## Configurar DarkMatter
 
@@ -44,6 +44,7 @@ Activa PROJECT_ZOMBOID en config.json y rellena:
 - SFTP_USERNAME
 - STATE_PATH
 - EVENTS_PATH
+- EVENT_PREFIX
 
 En la Raspberry, anade la contrasena solo a .env:
 

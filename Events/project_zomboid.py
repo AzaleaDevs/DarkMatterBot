@@ -120,6 +120,8 @@ class ProjectZomboidBridge(commands.Cog):
             remote_file.seek(offset)
             payload = remote_file.read()
 
+        event_prefix = str(self.settings.get("EVENT_PREFIX", "")).encode("utf-8")
+
         events: list[dict[str, Any]] = []
         consumed = 0
         for raw_line in payload.splitlines(keepends=True):
@@ -129,6 +131,11 @@ class ProjectZomboidBridge(commands.Cog):
             line = raw_line.strip()
             if not line:
                 continue
+            if event_prefix:
+                prefix_index = line.find(event_prefix)
+                if prefix_index < 0:
+                    continue
+                line = line[prefix_index + len(event_prefix):].strip()
             try:
                 event = json.loads(line.decode("utf-8"))
             except (UnicodeDecodeError, json.JSONDecodeError):
