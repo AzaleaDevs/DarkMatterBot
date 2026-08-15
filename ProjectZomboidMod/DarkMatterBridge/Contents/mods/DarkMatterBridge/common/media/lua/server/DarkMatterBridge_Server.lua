@@ -199,11 +199,7 @@ end
 
 local function onServerStarted()
     print("[DarkMatterBridge] Started")
-    local eventWriter = getFileWriter(EVENTS_FILE, true, true)
-    if eventWriter then
-        eventWriter:writeln("")
-        eventWriter:close()
-    end
+    writeTextFile(EVENTS_FILE, "", false)
     writeState()
 end
 
