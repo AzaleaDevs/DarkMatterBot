@@ -3,12 +3,6 @@ from discord import app_commands
 from discord.ext import commands
 import os
 import random
-import sys
-
-# Add parent directory to sys.path to ensure we can import from parent if needed
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from hola_db import is_user_registered
 
 class Poke(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -18,14 +12,6 @@ class Poke(commands.Cog):
 
     @app_commands.command(name="poke", description="Muestra un pokemon aleatorio de la carpeta Pokes.")
     async def poke(self, interaction: discord.Interaction):
-        # Optional: Check registration if needed, consistent with other commands
-        # if not await is_user_registered(interaction.user.id):
-        #     await interaction.response.send_message(
-        #         "Aún no estás registrado en el barrio para poder usar estos comandos. Prueba a hacer /start",
-        #         ephemeral=True
-        #     )
-        #     return
-
         if not os.path.exists(self.pokes_path):
             await interaction.response.send_message("Lo siento, no encuentro la carpeta de Pokes.", ephemeral=True)
             return
