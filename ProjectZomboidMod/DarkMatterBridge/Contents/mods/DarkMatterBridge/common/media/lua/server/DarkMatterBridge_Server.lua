@@ -6,6 +6,7 @@ local DEATH_DEDUPLICATION_MS = 10000
 
 local lastStateWrite = 0
 local lastDeathByUsername = {}
+local deadPlayers = {}
 
 local BACKSLASH = string.char(92)
 
@@ -160,7 +161,34 @@ local function onClientCommand(module, command, player, args)
     recordDeath(player, args, "client")
 end
 
+local function detectPlayerDeaths()
+    local players = getOnlinePlayers()
+    local onlinePlayers = {}
+
+    for index = 0, players:size() - 1 do
+        local player = players:get(index)
+        local username = tostring(callOr(player, "getUsername", "unknown"))
+        onlinePlayers[username] = true
+
+        local isDead = callOr(player, "isDead", false)
+        if isDead and not deadPlayers[username] then
+            deadPlayers[username] = true
+            recordDeath(player, nil, "server_poll")
+        elseif not isDead then
+            deadPlayers[username] = nil
+        end
+    end
+
+    for username in pairs(deadPlayers) do
+        if not onlinePlayers[username] then
+            deadPlayers[username] = nil
+        end
+    end
+end
+
 local function onTick()
+    detectPlayerDeaths()
+
     local now = getTimeInMillis()
     if now - lastStateWrite < WRITE_INTERVAL_MS then
         return
