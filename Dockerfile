@@ -1,17 +1,7 @@
 FROM python:3.10-slim
 
-# Dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    libjpeg62-turbo-dev \
-    zlib1g-dev \
-    libfreetype6 \
-    libfreetype6-dev \
-    liblcms2-dev \
-    libopenjp2-7-dev \
-    libharfbuzz-dev \
-    libtiff6 \
-    libwebp-dev \
-    libpng-dev \
+# Fuente usada por el comando /meme. Pillow incluye sus librerias nativas.
+RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
