@@ -1,5 +1,0 @@
-bot-url: "http://127.0.0.1:8088/minecraft/player-join"
-token: "00013071993"
-server-name: "Minecraft"
-connect-timeout-seconds: 5
-request-timeout-seconds: 5

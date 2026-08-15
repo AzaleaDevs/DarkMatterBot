@@ -22,7 +22,6 @@ TOKEN = os.getenv("DISCORD_TOKEN") or config.get("DISCORD_TOKEN")
 GUILD_ID = config["GUILD_ID"]
 PREFIX = "!"
 BOSS_KILL_API = config.get("BOSS_KILL_API", {})
-MINECRAFT_API = config.get("MINECRAFT_API", {})
 
 if not TOKEN or TOKEN.startswith("<"):
     raise RuntimeError("Missing DISCORD_TOKEN. Set it in .env or as an environment variable.")
@@ -55,33 +54,25 @@ class DarkMatterBot(commands.Bot):
         logger.info("BOT RUNNING")
 
     async def start_boss_kill_api(self):
-        boss_api_enabled = BOSS_KILL_API.get("ENABLED", False)
-        minecraft_api_enabled = MINECRAFT_API.get("ENABLED", False)
-        if not boss_api_enabled and not minecraft_api_enabled:
-            logger.info("Game event API disabled")
+        if not BOSS_KILL_API.get("ENABLED", False):
+            logger.info("Boss kill API disabled")
             return
 
-        if boss_api_enabled and (not BOSS_KILL_API.get("CHANNEL_ID") or not BOSS_KILL_API.get("TOKEN")):
+        if not BOSS_KILL_API.get("CHANNEL_ID") or not BOSS_KILL_API.get("TOKEN"):
             logger.warning("Boss kill API requires BOSS_KILL_API.CHANNEL_ID and BOSS_KILL_API.TOKEN")
-            return
-
-        if minecraft_api_enabled and (not MINECRAFT_API.get("CHANNEL_ID") or not MINECRAFT_API.get("TOKEN")):
-            logger.warning("Minecraft API requires MINECRAFT_API.CHANNEL_ID and MINECRAFT_API.TOKEN")
             return
 
         app = web.Application()
         app.add_routes([web.post("/azerothcore/boss-kill", self.handle_boss_kill)])
-        app.add_routes([web.post("/minecraft/player-join", self.handle_minecraft_player_join)])
 
-        server_config = MINECRAFT_API if minecraft_api_enabled else BOSS_KILL_API
-        host = server_config.get("HOST", BOSS_KILL_API.get("HOST", "0.0.0.0"))
-        port = int(server_config.get("PORT", BOSS_KILL_API.get("PORT", 8088)))
+        host = BOSS_KILL_API.get("HOST", "0.0.0.0")
+        port = int(BOSS_KILL_API.get("PORT", 8088))
 
         self.boss_kill_runner = web.AppRunner(app)
         await self.boss_kill_runner.setup()
         self.boss_kill_site = web.TCPSite(self.boss_kill_runner, host, port)
         await self.boss_kill_site.start()
-        logger.info(f"Game event API listening on {host}:{port}")
+        logger.info(f"Boss kill API listening on {host}:{port}")
 
     def get_request_token(self, request):
         request_token = request.headers.get("X-Darkmatter-Token")
@@ -140,40 +131,6 @@ class DarkMatterBot(commands.Bot):
         else:
             await channel.send(embed=embed)
         logger.info(f"Boss kill notification sent: {boss_name} by {killer_name}")
-        return web.json_response({"ok": True})
-
-    async def handle_minecraft_player_join(self, request):
-        expected_token = MINECRAFT_API.get("TOKEN")
-        request_token = self.get_request_token(request)
-
-        if request_token != expected_token:
-            return web.json_response({"error": "unauthorized"}, status=401)
-
-        try:
-            payload = await request.json()
-        except ValueError:
-            return web.json_response({"error": "invalid json"}, status=400)
-
-        player_name = str(payload.get("player_name") or "Jugador desconocido")
-        player_uuid = str(payload.get("player_uuid") or "").replace("-", "")
-        server_name = str(payload.get("server_name") or MINECRAFT_API.get("SERVER_NAME") or "Minecraft")
-
-        embed = discord.Embed(
-            title="Jugador conectado",
-            description=f"**{player_name}** se ha conectado.",
-            color=discord.Color.green()
-        )
-        embed.add_field(name="Servidor", value=server_name, inline=True)
-
-        if MINECRAFT_API.get("USE_SKIN_THUMBNAIL", True) and player_uuid:
-            embed.set_thumbnail(url=f"https://crafatar.com/avatars/{player_uuid}?size=128&overlay")
-
-        channel = self.get_channel(int(MINECRAFT_API["CHANNEL_ID"]))
-        if channel is None:
-            channel = await self.fetch_channel(int(MINECRAFT_API["CHANNEL_ID"]))
-
-        await channel.send(embed=embed)
-        logger.info(f"Minecraft join notification sent: {player_name} on {server_name}")
         return web.json_response({"ok": True})
 
     async def close(self):
