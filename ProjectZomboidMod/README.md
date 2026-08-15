@@ -9,7 +9,7 @@ El puente exporta el estado a un archivo y las muertes al log del servidor:
 - DarkMatterBridge_state.json: hora ingame y jugadores conectados.
 - World/server-console.txt: eventos de muerte identificados con [DarkMatterBridgeEvent].
 
-DarkMatter consulta el estado y el log por SFTP cada 30 segundos. Las muertes se publican en el canal configurado y /time muestra la fecha y hora ingame.
+DarkMatter consulta el estado y el log por SFTP cada 10 segundos. Las muertes se publican en el canal configurado y /time muestra la fecha y hora ingame.
 
 ## Instalar el mod
 
@@ -59,6 +59,6 @@ El primer acceso confia en la clave SSH presentada por GTXGaming y la guarda en 
 1. Arranca el servidor y entra con un jugador.
 2. Ejecuta /time en Discord.
 3. Mata un personaje de prueba.
-4. Espera hasta 30 segundos para recibir la notificacion.
+4. Espera hasta 10 segundos para recibir la notificacion.
 
 No publiques .env, la contrasena SFTP ni el token del bot.

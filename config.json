@@ -28,6 +28,6 @@
                             "STATE_PATH":  "/188.165.119.37_17200/World/Lua/DarkMatterBridge_state.json",
                             "EVENTS_PATH":  "/188.165.119.37_17200/World/server-console.txt",
                             "EVENT_PREFIX":  "[DarkMatterBridgeEvent] ",
-                            "POLL_SECONDS":  30
+                            "POLL_SECONDS":  10
                         }
 }
