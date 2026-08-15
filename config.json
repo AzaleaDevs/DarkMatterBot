@@ -1,4 +1,4 @@
-﻿{
+{
     "DISCORD_TOKEN":  "\u003cTOKEN_DEL_BOT_DE_DISCORD\u003e",
     "GUILD_ID":  "1395474837102788749",
     "STATE":  "Probando la materia.",
@@ -17,5 +17,16 @@
                           "CHANNEL_ID":  "1395474837589463114",
                           "SERVER_NAME":  "Minecraft",
                           "USE_SKIN_THUMBNAIL":  true
-                      }
+                      },
+    "PROJECT_ZOMBOID":  {
+                            "ENABLED":  true,
+                            "CHANNEL_ID":  "1395474837589463114",
+                            "SERVER_NAME":  "Project Zomboid",
+                            "SFTP_HOST":  "188.165.119.37",
+                            "SFTP_PORT":  8811,
+                            "SFTP_USERNAME":  "angeld",
+                            "STATE_PATH":  "/188.165.119.37_17200/World/Lua/DarkMatterBridge_state.json",
+                            "EVENTS_PATH":  "/188.165.119.37_17200/World/Lua/DarkMatterBridge_events.jsonl",
+                            "POLL_SECONDS":  30
+                        }
 }

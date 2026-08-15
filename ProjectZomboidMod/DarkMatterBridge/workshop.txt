@@ -1,0 +1,5 @@
+version=1
+id=0
+title=DarkMatter Server Bridge
+description=Connects a Project Zomboid Build 42 server with the DarkMatter Discord bot.
+visibility=public

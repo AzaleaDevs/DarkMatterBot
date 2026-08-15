@@ -1,0 +1,4 @@
+name=DarkMatter Server Bridge
+id=DarkMatterBridge
+description=Exports Project Zomboid server time and player death events for the DarkMatter Discord bot.
+poster=poster.png
