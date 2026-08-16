@@ -7,11 +7,11 @@
                           "HOST":  "0.0.0.0",
                           "PORT":  8088,
                           "TOKEN":  "00013071993",
-                          "CHANNEL_ID":  "1395474837589463114"
+                          "CHANNEL_ID":  "1538606400337612901"
                       },
     "PROJECT_ZOMBOID":  {
                             "ENABLED":  true,
-                            "CHANNEL_ID":  "1395474837589463114",
+                            "CHANNEL_ID":  "1538606400337612901",
                             "SERVER_NAME":  "Project Zomboid",
                             "SFTP_HOST":  "188.165.119.37",
                             "SFTP_PORT":  8811,
