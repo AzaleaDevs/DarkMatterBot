@@ -275,14 +275,19 @@ class ProjectZomboidBridge(commands.Cog):
         if channel is None:
             channel = await self.bot.fetch_channel(int(channel_id))
 
-        display_name = (
-            event.get("display_name")
-            or event.get("username")
+        username = str(
+            event.get("username")
+            or event.get("display_name")
             or "Superviviente desconocido"
         )
+        character_name = str(event.get("character_name") or "").strip()
+        display_name = username
+        if character_name and character_name.casefold() != username.casefold():
+            display_name = f"{username} ({character_name})"
+        display_name = discord.utils.escape_markdown(display_name)
         embed = discord.Embed(
             title="Superviviente caido",
-            description=f"**{display_name}** ha muerto en Project Zomboid.",
+            description=f"**{display_name}** ha muerto.",
             color=discord.Color.dark_red(),
         )
 

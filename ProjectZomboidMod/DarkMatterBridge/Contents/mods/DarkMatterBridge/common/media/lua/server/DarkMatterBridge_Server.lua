@@ -46,6 +46,13 @@ local function callOr(object, methodName, fallback)
     return fallback
 end
 
+local function getCharacterName(player)
+    local descriptor = callOr(player, "getDescriptor", nil)
+    local forename = tostring(callOr(descriptor, "getForename", ""))
+    local surname = tostring(callOr(descriptor, "getSurname", ""))
+    return (forename .. " " .. surname):match("^%s*(.-)%s*$")
+end
+
 local function gameSnapshotJson()
     local gameTime = getGameTime()
     return table.concat({
@@ -117,6 +124,10 @@ local function recordDeath(player, args, source)
 
     local displayName = args.displayName
         or callOr(player, "getDisplayName", username)
+    local characterName = tostring(args.characterName or "")
+    if characterName == "" then
+        characterName = getCharacterName(player)
+    end
     local hoursSurvived = args.hoursSurvived
         or callOr(player, "getHoursSurvived", 0)
     local zombieKills = args.zombieKills
@@ -132,6 +143,7 @@ local function recordDeath(player, args, source)
         '"source":', jsonString(source), ",",
         '"username":', jsonString(username), ",",
         '"display_name":', jsonString(displayName), ",",
+        '"character_name":', jsonString(characterName), ",",
         '"hours_survived":', jsonNumber(hoursSurvived), ",",
         '"zombie_kills":', jsonNumber(zombieKills), ",",
         '"x":', jsonNumber(math.floor(tonumber(x) or 0)), ",",
