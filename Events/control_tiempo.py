@@ -69,6 +69,12 @@ class ControlTiempo(commands.Cog):
         Adds euros to the user's account in the USUARIOS table.
         """
         async with aiosqlite.connect(DB_PATH) as db:
+            async with db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'USUARIOS'"
+            ) as cursor:
+                if await cursor.fetchone() is None:
+                    return
+
             await db.execute(
                 "UPDATE USUARIOS SET euros = euros + ? WHERE id = ?",
                 (euros, user_id)

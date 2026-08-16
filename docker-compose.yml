@@ -9,4 +9,5 @@ services:
       - "8088:8088"
     volumes:
       - ./data:/app/data
+      - ./data/database:/app/Databases
       - ./logs:/app/logs
