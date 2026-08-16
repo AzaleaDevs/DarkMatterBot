@@ -224,7 +224,17 @@ class ProjectZomboidBridge(commands.Cog):
             )
 
         embed.set_footer(text=str(self.settings.get("SERVER_NAME", "Project Zomboid")))
-        await channel.send(embed=embed)
+
+        thumbnail_file = None
+        thumbnail_path = Path("Images") / "avatar.png"
+        if thumbnail_path.is_file():
+            thumbnail_file = discord.File(thumbnail_path, filename="avatar.png")
+            embed.set_thumbnail(url="attachment://avatar.png")
+
+        if thumbnail_file:
+            await channel.send(embed=embed, file=thumbnail_file)
+        else:
+            await channel.send(embed=embed)
 
     @staticmethod
     def format_game_time(game: dict[str, Any]) -> str:
