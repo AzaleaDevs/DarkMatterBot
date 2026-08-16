@@ -4,6 +4,8 @@ import json
 import logging
 import os
 from pathlib import Path
+import posixpath
+import stat
 from typing import Any
 
 import discord
@@ -96,6 +98,87 @@ class ProjectZomboidBridge(commands.Cog):
         if not isinstance(data, dict):
             raise ValueError("El estado de Project Zomboid no es un objeto JSON")
         return data
+
+    @staticmethod
+    def _read_text_file(sftp: paramiko.SFTPClient, remote_path: str) -> str:
+        with sftp.open(remote_path, "rb") as remote_file:
+            return remote_file.read().decode("utf-8-sig", errors="replace")
+
+    @staticmethod
+    def _parse_ini_list(content: str, setting_name: str) -> list[str]:
+        expected = setting_name.casefold()
+        for raw_line in content.splitlines():
+            key, separator, value = raw_line.partition("=")
+            if separator and key.strip().casefold() == expected:
+                return [item.strip() for item in value.split(";") if item.strip()]
+        return []
+
+    @staticmethod
+    def _find_mod_info_files(
+        sftp: paramiko.SFTPClient,
+        root: str,
+        max_depth: int = 6,
+    ) -> list[str]:
+        found: list[str] = []
+        pending = [(root, 0)]
+        while pending:
+            current_path, depth = pending.pop()
+            try:
+                entries = sftp.listdir_attr(current_path)
+            except OSError:
+                continue
+            for entry in entries:
+                child_path = posixpath.join(current_path, entry.filename)
+                if stat.S_ISDIR(entry.st_mode) and depth < max_depth:
+                    pending.append((child_path, depth + 1))
+                elif entry.filename.casefold() == "mod.info":
+                    found.append(child_path)
+        return found
+
+    def _fetch_installed_mods(self) -> list[str]:
+        ini_path = str(self.settings.get("SERVER_INI_PATH", "")).strip()
+        workshop_root = str(
+            self.settings.get("WORKSHOP_CONTENT_PATH", "")
+        ).strip()
+        if not ini_path or not workshop_root:
+            raise RuntimeError(
+                "Faltan SERVER_INI_PATH o WORKSHOP_CONTENT_PATH en PROJECT_ZOMBOID"
+            )
+
+        client, sftp = self._connect()
+        try:
+            ini_content = self._read_text_file(sftp, ini_path)
+            mod_ids = self._parse_ini_list(ini_content, "Mods")
+            workshop_ids = self._parse_ini_list(ini_content, "WorkshopItems")
+
+            names_by_id: dict[str, str] = {}
+            discovered_names: list[str] = []
+            for workshop_id in workshop_ids:
+                item_root = posixpath.join(workshop_root, workshop_id)
+                for info_path in self._find_mod_info_files(sftp, item_root):
+                    metadata: dict[str, str] = {}
+                    for raw_line in self._read_text_file(sftp, info_path).splitlines():
+                        key, separator, value = raw_line.partition("=")
+                        if separator:
+                            metadata[key.strip().casefold()] = value.strip()
+                    mod_id = metadata.get("id")
+                    mod_name = metadata.get("name")
+                    if mod_name and mod_name not in discovered_names:
+                        discovered_names.append(mod_name)
+                    if mod_id and mod_name:
+                        names_by_id.setdefault(mod_id, mod_name)
+
+            if mod_ids:
+                return [names_by_id.get(mod_id, mod_id) for mod_id in mod_ids]
+            return discovered_names
+        finally:
+            sftp.close()
+            client.close()
+
+    async def get_installed_mods(self) -> list[str]:
+        if not self.enabled:
+            raise RuntimeError("La integracion de Project Zomboid esta desactivada")
+        return await asyncio.to_thread(self._fetch_installed_mods)
 
     def _read_events(
         self,

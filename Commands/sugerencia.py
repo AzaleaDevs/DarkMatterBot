@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 
 import aiosqlite
 import discord
@@ -7,6 +8,7 @@ from discord.ext import commands
 
 
 DB_PATH = Path("Databases") / "darkmatter_pro.db"
+logger = logging.getLogger(__name__)
 
 
 async def initialize_database() -> None:
@@ -171,13 +173,74 @@ class Suggestions(commands.Cog):
     )
     @app_commands.describe(tipo="Contenido que quieres listar")
     @app_commands.choices(
-        tipo=[app_commands.Choice(name="sugerencias", value="sugerencias")]
+        tipo=[
+            app_commands.Choice(name="sugerencias", value="sugerencias"),
+            app_commands.Choice(name="mods", value="mods"),
+        ]
     )
     async def list_items(
         self,
         interaction: discord.Interaction,
         tipo: app_commands.Choice[str],
     ) -> None:
+        if tipo.value == "mods":
+            bridge = getattr(self.bot, "project_zomboid_bridge", None)
+            if bridge is None or not bridge.enabled:
+                await interaction.response.send_message(
+                    "La integración de Project Zomboid no está configurada.",
+                    ephemeral=True,
+                )
+                return
+
+            await interaction.response.defer(thinking=True)
+            try:
+                mods = await bridge.get_installed_mods()
+            except Exception:
+                logger.exception("No se pudo consultar la lista de mods")
+                await interaction.followup.send(
+                    "No se pudo consultar la lista de mods del servidor.",
+                    ephemeral=True,
+                )
+                return
+
+            if not mods:
+                await interaction.followup.send(
+                    embed=discord.Embed(
+                        title="Mods instalados",
+                        description="No hay mods instalados actualmente.",
+                        color=discord.Color.blurple(),
+                    )
+                )
+                return
+
+            pages: list[str] = []
+            current_page = ""
+            for name in mods:
+                line = "- " + discord.utils.escape_markdown(name) + chr(10)
+                if current_page and len(current_page) + len(line) > 3800:
+                    pages.append(current_page)
+                    current_page = ""
+                current_page += line
+            if current_page:
+                pages.append(current_page)
+
+            embeds = []
+            for index, page in enumerate(pages, start=1):
+                embed = discord.Embed(
+                    title="Mods instalados",
+                    description=page,
+                    color=discord.Color.blurple(),
+                )
+                footer = f"{len(mods)} mods"
+                if len(pages) > 1:
+                    footer += f" · Página {index} de {len(pages)}"
+                embed.set_footer(text=footer)
+                embeds.append(embed)
+
+            for offset in range(0, len(embeds), 10):
+                await interaction.followup.send(embeds=embeds[offset : offset + 10])
+            return
+
         async with aiosqlite.connect(DB_PATH) as db:
             async with db.execute(
                 """
